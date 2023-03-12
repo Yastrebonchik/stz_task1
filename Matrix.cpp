@@ -109,7 +109,7 @@ void	Matrix::swapLinesWithMaxAik(size_t begLine, size_t k) {
 
 	aim = begLine;
 	for (size_t i = begLine; i < this->_linesQuan; ++i) {
-		if (this->_mat[aim][k] == 0 || this->_mat[i][k] > this->_mat[aim][k])
+		if (this->_mat[aim][k] == 0 || (this->_mat[i][k] > this->_mat[aim][k] && this->_mat[i][k] != 0))
 			aim = i;
 	}
 	this->swapLines(begLine, aim);
@@ -118,16 +118,13 @@ void	Matrix::swapLinesWithMaxAik(size_t begLine, size_t k) {
 Matrix	Matrix::triangle() const {
 	Matrix	ret;
 	float	mu;
+	int		flag;
 
 	ret = *this;
-	ret.swapLinesWithMaxAik(0, 0);
+	if (this->_mat[0][0] == 0)
+		ret.swapLinesWithMaxAik(0, 0);
 	for (size_t i = 1; i < ret._linesQuan; ++i) {
-		if (ret._mat[i][i] == 0) {
-
-		}
 		ret.swapLinesWithMaxAik(i, i);
-		if (ret._mat[i][i] == 0)
-			return (ret);
 		for (size_t k = i; k < ret._linesQuan; ++k) {
 			mu = ret._mat[k][i - 1] / ret._mat[i - 1][i - 1];
 			if (mu != 0) {
@@ -137,14 +134,16 @@ Matrix	Matrix::triangle() const {
 			}
 		}
 		if (ret._mat[i][i] == 0) {
+			flag = 0;
 			for (int k = i; k < ret._linesQuan; ++k) {
 				if (ret._mat[k][i] != 0) {
-					for (size_t j = 0; j < ret._columnsQuan; ++j) {
-						ret._mat[i][j] = ret._mat[i][j] - ret._mat[k][j];
-					}
+					ret.swapLines(i, k);
+					flag = 1;
 					break;
 				}
 			}
+			if (!flag)
+				return (ret);
 		}
 	}
 	return (ret);
@@ -178,7 +177,7 @@ void	Matrix::solve() const {
 	for (int i = solution.size() - 1; i >= 0 ; --i) {
 		sum = 0;
 		for (int j = i + 1; j < sol._linesQuan - 1; ++j) {
-			sum += sol[i][j];
+			sum += sol[i][j] * solution[j];
 		}
 		val = (sol[i][sol._columnsQuan - 1] - sum) / sol[i][i];
 		solution[i] = val;
