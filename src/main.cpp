@@ -2,14 +2,14 @@
 
 int main() {
 	std::string	filename1;
-	std::string filename2;
+	std::string	filename2;
 	std::string	filename3;
 	std::string	filename4;
 	std::string	filename5;
 	std::string	filename6;
 	std::string	filename7;
 	std::string	filename8;
-	std::string filename9;
+	std::string	filename9;
 	std::string	filename10;
 	std::string	filename11;
 	std::string	filename12;
