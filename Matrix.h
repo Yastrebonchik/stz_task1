@@ -8,33 +8,35 @@
 # include <vector>
 # include <fstream>
 # include <iostream>
-//?# include <Eigen/Dense>
 
 class Matrix {
 private:
 	float	_detSign;
 	size_t	_linesQuan;
 	size_t	_columnsQuan;
-	std::vector<std::vector<float>>	_mat;
+	std::vector<std::vector<double>>	_mat;
 
 	void	swapLines(size_t line1, size_t line2);
 	void	swapLinesWithMaxAik(size_t begLine, size_t k);
 
 public:
 	Matrix();
+	explicit Matrix(size_t linesQuan, size_t _colQuan, short type);
 	explicit Matrix(std::string filename);
-	Matrix(Matrix &other);
+	Matrix(const Matrix &other);
 	Matrix(size_t linesQuan, size_t _colQuan, std::vector<float> values);
 
 	Matrix&	operator=(const Matrix &rhs);
-	const std::vector<float>&	operator[](int rhs) const;
+	Matrix	operator*(const Matrix &rhs);
+	const std::vector<double>&	operator[](int rhs) const;
 
-	void	addMatrixFromRight(Matrix other);
 	Matrix	triangle() const;
+	std::pair<Matrix, Matrix>	LU() const;
 	float	findDet() const;
-	void	solve() const;
+	Matrix	solve() const;
 	Matrix	inverseMatrix() const;
-	std::pair<Matrix, Matrix>	matSeparate();
+
+	friend std::ostream& operator<<(std::ostream& os, const Matrix& dt);
 };
 
 
