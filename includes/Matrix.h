@@ -21,8 +21,8 @@ private:
 
 public:
 	Matrix();
-	explicit Matrix(size_t linesQuan, size_t _colQuan, short type);
-	explicit Matrix(std::string filename);
+	Matrix(std::string filename);
+	Matrix(size_t linesQuan, size_t _colQuan, short type);
 	Matrix(const Matrix &other);
 	Matrix(size_t linesQuan, size_t _colQuan, std::vector<float> values);
 
@@ -31,9 +31,8 @@ public:
 	const std::vector<double>&	operator[](int rhs) const;
 
 	Matrix	triangle() const;
-	std::pair<Matrix, Matrix>	LU() const;
 	float	findDet() const;
-	Matrix	solve() const;
+	Matrix	solve(const Matrix &b) const;
 	Matrix	inverseMatrix() const;
 
 	friend std::ostream& operator<<(std::ostream& os, const Matrix& dt);

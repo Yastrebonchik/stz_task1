@@ -3,4 +3,6 @@ project(task1)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(task1 main.cpp Matrix.cpp Matrix.h)
+add_executable(task1 src/main.cpp src/Matrix.cpp includes/Matrix.h)
+
+include_directories(includes)

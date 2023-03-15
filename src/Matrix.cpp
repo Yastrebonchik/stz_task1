@@ -30,7 +30,6 @@ Matrix::Matrix(std::string filename) {
 	std::fstream	file;
 
 	file.open(filename, std::fstream::in | std::fstream::out);
-	std::cout << "file is opened: " << file.is_open() << std::endl;
 
 	this->_detSign = 1;
  	file >> this->_linesQuan >> this->_columnsQuan;
@@ -173,39 +172,6 @@ Matrix	Matrix::triangle() const {
 	return (ret);
 }
 
-
-std::pair<Matrix, Matrix>	Matrix::LU() const {
-	std::pair<Matrix, Matrix>	ret;
-	Matrix	L;
-	Matrix	LMid;
-	Matrix	U;
-
-	L._linesQuan = this->_linesQuan;
-	L._columnsQuan = this->_columnsQuan;
-	L._mat.resize(_linesQuan);
-	U = *this;
-	for (int i = 0; i < _linesQuan; ++i) {
-		L._mat[i].resize(_columnsQuan);
-	}
-//	for (int i = 0; i < _linesQuan; ++i) {
-//		L._mat[i][i] = 1;
-//		for (int j = i + 1; j < L._columnsQuan; j++)
-//			L._mat[j][i] = U._mat[j][i] / U._mat[i][i];
-//	}
-//	for (int k = 1; k < L._columnsQuan; k++) {
-//		for (int i = k - 1; i < L._columnsQuan; i++)
-//			for (int j = i; j < L._columnsQuan; j++)
-//				L._mat[j][i] = U[j][i] / U[i][i];
-//		for (int i = k; i < L._columnsQuan; i++)
-//			for (int j = k-1; j < L._columnsQuan; j++)
-//				U._mat[i][j] = U[i][j] - L[i][k - 1] * U[k - 1][j];
-//	}
-	ret.first = L;
-	ret.second = U;
-	ret = std::make_pair(L, U);
-	return (ret);
-}
-
 float	Matrix::findDet() const {
 	Matrix	triangle;
 	float	det;
@@ -218,7 +184,7 @@ float	Matrix::findDet() const {
 	return (det);
 }
 
-Matrix	Matrix::solve() const {
+Matrix	Matrix::solve(const Matrix &b) const {
 	Matrix	A;
 	Matrix	ret(this->_linesQuan, 1, zero);
 	std::vector<float>	solution;
@@ -226,11 +192,20 @@ Matrix	Matrix::solve() const {
 	float	val;
 
 	if (this->findDet() == 0) {
-		std::cout << "No solution" << std::endl;
+		std::cout << "\033[1;31mNo solution\033[0m" << std::endl;
 		return (ret);
 	}
-	A = this->triangle();
+	A = *this;
+	A._columnsQuan++;
+	ret._linesQuan = this->_columnsQuan;
+	ret._mat.resize(_linesQuan);
+	for (int i = 0; i < A._linesQuan; ++i) {
+		A._mat[i].resize(A._columnsQuan);
+		A._mat[i][A._columnsQuan - 1] = b[i][0];
+		ret._mat[i].resize(ret._columnsQuan);
+	}
 	solution.resize(A._linesQuan);
+	A = A.triangle();
 	for (int i = solution.size() - 1; i >= 0 ; --i) {
 		sum = 0;
 		for (int j = i + 1; j < A._columnsQuan - 1; ++j) {
@@ -259,47 +234,28 @@ Matrix	Matrix::inverseMatrix() const {
 	Matrix	A;
 	Matrix	ret;
 	Matrix	E(this->_linesQuan, this->_columnsQuan, diag);
+	Matrix	ESmall(4, 1, zero);
 	Matrix	x;
 
+	if (this->findDet() == 0) {
+		std::cout << "\033[1;31mNo inverse matrix\033[0m" << std::endl;
+		return (ret);
+	}
 	A = *this;
-	A._columnsQuan++;
 	ret._columnsQuan = this->_columnsQuan;
 	ret._linesQuan = this->_columnsQuan;
 	ret._mat.resize(_linesQuan);
 	for (int i = 0; i < A._linesQuan; ++i) {
-		A._mat[i].resize(A._columnsQuan);
 		ret._mat[i].resize(ret._columnsQuan);
 	}
 	for (int i = 0; i < this->_columnsQuan; ++i) {
 		for (int j = 0; j < A._linesQuan; ++j) {
-			A._mat[j][A._columnsQuan - 1] = E[j][i];
+			ESmall._mat[j][0] = E[j][i];
 		}
-		x = A.solve();
+		x = A.solve(ESmall);
 		for (int j = 0; j < x._linesQuan; ++j) {
 			ret._mat[j][i] = x[j][0];
 		}
 	}
-//	Matrix	Y(this->_linesQuan, 1, 0);
-//	Matrix	E(this->_columnsQuan, this->_linesQuan, diag);
-
-//	LU = this->LU();
-//	ret._linesQuan = this->_linesQuan;
-//
-//	for (int k = 0; k < ret._linesQuan; ++k) {
-//		for (int i = 0; i < Y._linesQuan; ++i) {
-//			sum = 0;
-//			for (int j = 0; j < i; ++j) {
-//				sum += Y[j][0] * LU.first[i][j];
-//			}
-//			Y._mat[i][0] = E[i][k] - sum;
-//		}
-//		for (int i = ret._linesQuan - 1; i >= 0 ; --i) {
-//			sum = 0;
-//			for (int j = i; j < ret._linesQuan - 1; ++j) {
-//				sum += LU.second[i][j] * ret[j][k];
-//			}
-//			ret._mat[i][k] = (Y[i][0] - sum) / LU.second[i][i];
-//		}
-//	}
 	return (ret);
 };
