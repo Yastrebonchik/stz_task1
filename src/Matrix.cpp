@@ -234,7 +234,7 @@ Matrix	Matrix::inverseMatrix() const {
 	Matrix	A;
 	Matrix	ret;
 	Matrix	E(this->_linesQuan, this->_columnsQuan, diag);
-	Matrix	ESmall(4, 1, zero);
+	Matrix	ESmall(this->_linesQuan, 1, zero);
 	Matrix	x;
 
 	if (this->findDet() == 0) {
